@@ -2,6 +2,11 @@ import inspect
 import re
 
 
+def strip_colour_codes(string):
+    pattern = re.compile(r'\x1B\[\d+(;\d+){0,2}m')
+    return pattern.sub('', string)
+
+
 def get_pytest_input(func):
     """
     Convert function object to pytest input string.
@@ -115,7 +120,7 @@ def get_summary(message):
         The summary statement
     """
     groups = re.search(
-        r"=* short test summary info =*\nFAILED .*?::.*? - (.*)", message
+        r"=* short test summary info =*\nFAILED .*?::.*? - (.*)", strip_colour_codes(message)
     ).groups()
 
     return groups[0]
