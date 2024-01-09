@@ -110,7 +110,7 @@ def mpi_parallel(nprocs: int, mpi_executable_name=None):
                     subprocess.check_output(
                         [
                             executable,
-                            "-np",
+                            "-n",
                             str(mpi_procs),
                             sys.executable,
                             "-m",
