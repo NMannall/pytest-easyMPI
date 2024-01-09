@@ -1,4 +1,5 @@
 import inspect
+import os
 import re
 
 
@@ -27,9 +28,9 @@ def get_pytest_input(func):
         Input string for pytest to run the given test function
 
     """
-    module = inspect.getmodule(func).__name__
+    module = inspect.getfile(func)
+    module = os.path.relpath(module)
 
-    module = "/".join(module.split(".")) + ".py"
     func = "::".join(func.__qualname__.split("."))
 
     return f"{module}::{func}"
