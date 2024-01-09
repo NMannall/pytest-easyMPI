@@ -3,6 +3,7 @@ import os
 import shutil
 import subprocess
 import sys
+import psutil
 
 import pytest
 from colorama import Fore, Style
@@ -97,12 +98,20 @@ def mpi_parallel(nprocs: int, mpi_executable_name=None):
 
                 failed = False
 
+                if isinstance(nprocs, str) and nprocs in kwargs.keys():
+                    mpi_procs = kwargs[nprocs]
+                else:
+                    mpi_procs = nprocs
+
+                if psutil.cpu_count(logical=False) < mpi_procs:
+                    pytest.skip(f"There are not enough slots available in the system to satisfy the {mpi_procs} MPI processes required by the test")
+
                 try:
                     subprocess.check_output(
                         [
                             executable,
                             "-np",
-                            str(nprocs),
+                            str(mpi_procs),
                             sys.executable,
                             "-m",
                             "mpi4py",
@@ -116,7 +125,7 @@ def mpi_parallel(nprocs: int, mpi_executable_name=None):
                     alternative_output = error.output
 
                 errors = []
-                for i in range(nprocs):
+                for i in range(mpi_procs):
                     file_name = f"{temp_ouput_file(test_name)}_{i}"
                     if os.path.isfile(file_name):
                         with open(file_name) as f:

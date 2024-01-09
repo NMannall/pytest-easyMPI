@@ -1,4 +1,5 @@
 colorama
 mpi4py
 pbr
+psutil
 pytest
